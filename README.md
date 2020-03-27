@@ -2,8 +2,8 @@
 
 This repository contains the code and model used for the following papers:
 
-- [[PDF]]() Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, PamelaVentola, Linda Shapiro, and Frederick Shic. 2020. Selection of Eye-Tracking Stimuli for Prediction by Sparsely Grouped Input Variablesfor Neural Networks: towards Biomarker Refinement for Autism. In ETRA '20: ACM Symposium on Eye Tracking Research and Appli-cations, June 02–05, 2020, Stuttgart, Germany. ACM, New York, NY, USA, 10 pages
-- [[PDF]](https://arxiv.org/pdf/1911.13068) Beibin Li, Nicholas Nuechterlein, Erin Barney, Caitlin Hudac, Pamela Ventola, Shaprio Linda, Frederick Shic. 2019. Sparsely Grouped Input Variables for Neural Networks. arXiv preprint arXiv:1911.13068.
+- [[PDF Coming Soon]]() Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, Pamela Ventola, Linda Shapiro, and Frederick Shic. 2020. _Selection of Eye-Tracking Stimuli for Prediction by Sparsely Grouped Input Variablesfor Neural Networks: towards Biomarker Refinement for Autism_. In ETRA '20: ACM Symposium on Eye Tracking Research and Appli-cations, June 02–05, 2020, Stuttgart, Germany. ACM, New York, NY, USA, 10 pages
+- [[PDF]](https://arxiv.org/pdf/1911.13068) Beibin Li, Nicholas Nuechterlein, Erin Barney, Caitlin Hudac, Pamela Ventola, Shaprio Linda, Frederick Shic. 2019. _Sparsely Grouped Input Variables for Neural Networks_. arXiv preprint arXiv:1911.13068.
 
 The contribution of this project is:
 1. The SGIN model, which contains the Grouped L1 loss and Stochastic Blockwise Coordinated Gradient Descent (SBCGD) algorithm. Note that lots of previous research have applied similar loss to neural networks, but we are the first one focused on developing a faster optimization algorithm with given loss.
@@ -31,8 +31,19 @@ If you would like to use SGIN for your project, you can simply copy and paste on
 
 The intuition of our model is loss function is straightforward...
 
+The loss is defined as:
 
-![](img/sgin_algo.JPG)
+<br>
+<center><img src="img/loss.png" width="400"></img></center>
+<br>
+
+Applying gradient descent (GD) or SGD directly to the loss does not guarantee group sparsity for the NN, because SGD does not guarantee convergence if the loss is not differentiable. However, the regularization for each group $||\theta_i||_2$ is not differentiable at the origin, which is preferred by our loss function to sparse groups.
+Using coordinate descent, blockwise coordinate descent (BCD), or graphical lasso algorithm is not feasible either because these methods can only optimize parameters in the first hidden layer. 
+Instead, we combine these optimization methods to create the new optimization algorithm, Stochastic Blockwise Coordinated Gradient Descent,  shown below.
+
+<center><img src="img/sgin_algo.jpg" width="90%"></img></center>
+
+
 
 
 
@@ -66,21 +77,23 @@ Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non
 
 ### RNA Splicing Experiment
 
-In this experiment, we still perform binary classification on a simple dataset, Hollywood RNA Alternative Splicing Database. 
+In this experiment, we will perform binary classification on Hollywood RNA Alternative Splicing Database. The dataset can be downloaded from [Google Drive](https://drive.google.com/file/d/1bJhqThfLHym1BJSj1qdWe6iQrsZz-rev/view?usp=sharing), a mirror of the [original](http://hollywood.mit.edu/hollywood/Login.php) dataset. Please follow the instructions, guidelines, and license requirements from the MIT Hollywood group. Download and unzip the file, so that you have the folder in the form "data_prepare/mit_gene". Then, run
+`python preprocess_rna_splicing.py` to convert the files. 
 
 Before deep learning era, some researchers use balance sampling to get a subset of training set so that both the positive and negative class have equal number of samples. In recent decade, people prefer to use as much data as possible and then apply weighted loss to balance the loss from the positive and negative classes.
 In this experiment, we will perform both the "balance subset with standard loss" and the "all training samples with weighted loss" experiments. We split the data into train/valid/test parts, run the machine learning models, and report the testing results from the model with the best validation performance. Data split details is in [preprocess_rna_splicing.py](data_prepare/preprocess_rna_splicing.py) code and the [paper](https://arxiv.org/pdf/1911.13068) (page. 5).
 
 
-We select the run with best validation performance in each "Number of Sparse Groups" and then report the testing performance. The higher the Max CC, the better the results.
+We select the run with best validation performance in each "Number of Sparse Groups" and then report the testing performance. The higher the Max CC, the better the results. Here we compare SGIN, lasso, and GLLR (group lasso for logistic regression). The GLLR results are computed from the [R package (grplasso)](https://cran.r-project.org/web/packages/grplasso/index.html) provided by Meier et al.
 
 Run the following commands for experiments
 ```
-python rna_experiment.py --models SGIN lasso group_lasso --sampling balance
+python rna_experiment.py --models SGIN lasso --sampling balance
 python rna_experiment.py --models SGIN  --sampling all
 ```
 
-![](img/rna_rst.png)
+<center><img src="img/rna_rst.png"></img></center>
+
 
 You can also try to use alternative optimization algorithms for this dataset. 
 ```
