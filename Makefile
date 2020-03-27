@@ -9,3 +9,8 @@ rna:
 
 
 
+
+asd:
+	python et_asd_classification.py --models SGIN lasso group_lasso
+	# Additional optimizer experiments
+	python et_asd_classification.py --models theory nn sgd

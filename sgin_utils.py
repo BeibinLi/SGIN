@@ -146,9 +146,7 @@ def classification_metric(all_real, all_pred, all_prob):
         best_cc = 0    
         for threshold in np.arange(np.min(all_prob), np.max(all_prob), 0.01):
             cc = np.corrcoef(all_real, all_prob > threshold)[0][1]
-            best_cc = max(cc, best_cc)
-        print("!" * 30, "CC = ", best_cc, "!" * 30)
-             
+            best_cc = max(cc, best_cc)             
     else:
         best_cc = 0
     

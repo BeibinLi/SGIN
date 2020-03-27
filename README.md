@@ -6,8 +6,8 @@ This repository contains the code and model used for the following papers:
 - [[PDF]](https://arxiv.org/pdf/1911.13068) Beibin Li, Nicholas Nuechterlein, Erin Barney, Caitlin Hudac, Pamela Ventola, Shaprio Linda, Frederick Shic. 2019. _Sparsely Grouped Input Variables for Neural Networks_. arXiv preprint arXiv:1911.13068.
 
 The contribution of this project is:
-1. The SGIN model, which contains the Grouped L1 loss and Stochastic Blockwise Coordinated Gradient Descent (SBCGD) algorithm. Note that lots of previous research have applied similar loss to neural networks, but we are the first one focused on developing a faster optimization algorithm with given loss.
-2. Application to real world dataset, including the eye-tracking dataset for children with Autism Spectrum Disorder (ASD).
+1. The SGIN model, which contains groups of grouped L1 loss and Stochastic Blockwise Coordinated Gradient Descent (SBCGD) algorithm.
+2. Application to analyze the real-world eye-tracking dataset for children with Autism Spectrum Disorder (ASD). We also provided experiments for other simpler datasets, including RNA splicing, MNIST, and XOR simulation.  
 
 
 
@@ -17,7 +17,7 @@ Using this repository might require some familiarity with Python coding. We reco
 
 After installing Python or Anaconda, you should install the dependencies:
 1. Install PyTorch following the official [guide](https://pytorch.org/)
-2. Install other required packages `pip install pyglmnet sklearn pandas scipy tqdm matplotlib PyWavelets`
+2. Install other required packages `pip install pyglmnet sklearn pandas scipy tqdm matplotlib python-mnist PyWavelets`
 
 
 If you are comfortable with command line tools, you can read [conda tutorial](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) and [environment.yml](environment.yml) file for more package details. 
@@ -29,20 +29,23 @@ If you would like to use SGIN for your project, you can simply copy and paste on
 
 ## Model and Algorithm Explanation
 
-The intuition of our model is loss function is straightforward...
+We want to solve "grouped variable" selection problem, and the intuition of our solution is straightforward.
 
-The loss is defined as:
+People usually use L1 regularization to achieve sparsity in a machine learning model, which is a common way since 1990s. In 2006, Yuan et al. developed group lasso (with grouped L1 regularization) to achieve sparsity for a group of variables. After 2010, people apply this method to prune convolutional neural networks, which can be achieved by enforcing a convolutional filter to be sparse. Detailed introduction and discussion about previous studies can be found in our papers.
+
+
+Inspired previous studies, we define our loss below, which contains a group of grouped L1 regularization (yes, a group of groups): 
 
 <br>
-<center><img src="img/loss.png" width="400"></img></center>
+<p align="center"><img src="img/loss.png" width="400"></img></p>
 <br>
 
+Previous studies usually use standard optimizers (e.g. SGD, Adam, RMSProp, etc.) to train their models, but their solution does not fit our needs.
 Applying gradient descent (GD) or SGD directly to the loss does not guarantee group sparsity for the NN, because SGD does not guarantee convergence if the loss is not differentiable. However, the regularization for each group $||\theta_i||_2$ is not differentiable at the origin, which is preferred by our loss function to sparse groups.
 Using coordinate descent, blockwise coordinate descent (BCD), or graphical lasso algorithm is not feasible either because these methods can only optimize parameters in the first hidden layer. 
-Instead, we combine these optimization methods to create the new optimization algorithm, Stochastic Blockwise Coordinated Gradient Descent,  shown below.
+Instead, we combine these optimization methods to create the new optimization algorithm, Stochastic Blockwise Coordinated Gradient Descent, shown below.
 
-<center><img src="img/sgin_algo.jpg" width="90%"></img></center>
-
+<p align="center"><img src="img/sgin_algo.JPG" width="90%"></img></p>
 
 
 
@@ -60,11 +63,31 @@ Instead, we combine these optimization methods to create the new optimization al
 
 
 
-## Experimentation Code
+## Experiments
 
 ### Autism Classification and Regression
-Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non-ASD classification experiment and 
-[et_regression.py](et_regression.py) for the IQ regression experiment.
+Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non-ASD classification experiments and 
+[et_regression.py](et_regression.py) for the regression experiments.
+
+Note that we only provided the dummy data (i.e. randomly generated data) for the eye-tracking experiments because of IRB (Institutional Review Board) restrictions.
+In the future, we will provide a public link for users to register account, sign consent form, and then download the actual eye-tracking data. 
+
+The dummy data are stored in CSV files under the [data_prepare/](data_prepare/) folder. The last column of each CSV file is the label for the data, and all the other columns are features that will be used for machine learning.
+
+#### ASD/non-ASD Classification
+
+Details about our ASD/non-ASD classification can be found in our ACM ETRA 2020 paper. Here, we discuss how to run the experiments in Python.
+
+Run the commands `python et_asd_classification.py --models SGIN lasso group_lasso` to get results for SGIN, lasso, and group lasso. The results will be saved in a TSV file.
+
+<p align="center"><img src="img/simons_auc.png"></img></p>
+
+You can run  `python et_asd_classification.py --models theory nn sgd` command if you want to compare different optimization algorithms for the SGIN model.
+
+
+#### ADOS/IQ/SRS/Vineland Regression
+
+ADOS, IQ, SRS, and Vineland scores are important to survey autism severity. Our SGIN model and lasso performs well to predict IQ for participants, but all methods failed to predict ADOS/SRS/Vineland scores because of the limitation of our dataset. 
 
 
 
@@ -72,7 +95,10 @@ Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non
 ### MNIST Classification Experiment
 
 
-### MNIST Wavelet Experiment
+Results are shown below.
+
+<p align="center"><img src="img/rst_for_mnist_raw_linear.png"></img></p>
+
 
 
 ### RNA Splicing Experiment
@@ -92,7 +118,7 @@ python rna_experiment.py --models SGIN lasso --sampling balance
 python rna_experiment.py --models SGIN  --sampling all
 ```
 
-<center><img src="img/rna_rst.png"></img></center>
+<p align="center"><img src="img/rna_rst.png"></img></p>
 
 
 You can also try to use alternative optimization algorithms for this dataset. 
@@ -101,6 +127,6 @@ python rna_experiment.py --models sgd theory  --sampling balance
 python rna_experiment.py --models sgd theory  --sampling all
 ```
 
-Recommended Papers:
+Recommended Papers for this dataset:
 - Yeo, Gene, and Christopher B. Burge. "Maximum entropy modeling of short sequence motifs with applications to RNA splicing signals." Journal of computational biology 11.2-3 (2004): 377-394.
 - Meier, Lukas, Sara Van De Geer, and Peter Bühlmann. "The group lasso for logistic regression." Journal of the Royal Statistical Society: Series B (Statistical Methodology) 70.1 (2008): 53-71.
