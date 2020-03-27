@@ -1,0 +1,19 @@
+name: torch
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.6.10=h9f7ef89_1
+  - pytorch=1.4.0=py3.6_cuda101_cudnn7_0
+  - torchvision=0.5.0=py36_cu101
+  - pip:
+    - matplotlib==3.2.1
+    - pandas==1.0.3
+    - pyglmnet==1.1
+    - pywavelets==1.1.1
+    - scikit-learn==0.22.2.post1
+    - scipy==1.4.1
+    - sklearn==0.0
+    - tqdm==4.43.0
+prefix: C:\ProgramData\Anaconda3\envs\torch
+

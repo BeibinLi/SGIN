@@ -2,8 +2,8 @@
 
 This repository contains the code and model used for the following papers:
 
-- [PDF]() Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, PamelaVentola, Linda Shapiro, and Frederick Shic. 2020. Selection of Eye-Tracking Stimuli for Prediction by Sparsely Grouped Input Variablesfor Neural Networks: towards Biomarker Refinement for Autism.InETRA ’20: ACM Symposium on Eye Tracking Research and Appli-cations, June 02–05, 2020, Stuttgart, Germany.ACM, New York, NY,USA, 10 pages
-- [PDF](https://arxiv.org/pdf/1911.13068) Beibin Li, Nicholas Nuechterlein, Erin Barney, Caitlin Hudac, Pamela Ventola, Shaprio Linda, Frederick Shic. 2019. Sparsely Grouped Input Variables for Neural Networks. arXiv preprint arXiv:1911.13068.
+- [[PDF]]() Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, PamelaVentola, Linda Shapiro, and Frederick Shic. 2020. Selection of Eye-Tracking Stimuli for Prediction by Sparsely Grouped Input Variablesfor Neural Networks: towards Biomarker Refinement for Autism. In ETRA '20: ACM Symposium on Eye Tracking Research and Appli-cations, June 02–05, 2020, Stuttgart, Germany. ACM, New York, NY, USA, 10 pages
+- [[PDF]](https://arxiv.org/pdf/1911.13068) Beibin Li, Nicholas Nuechterlein, Erin Barney, Caitlin Hudac, Pamela Ventola, Shaprio Linda, Frederick Shic. 2019. Sparsely Grouped Input Variables for Neural Networks. arXiv preprint arXiv:1911.13068.
 
 The contribution of this project is:
 1. The SGIN model, which contains the Grouped L1 loss and Stochastic Blockwise Coordinated Gradient Descent (SBCGD) algorithm. Note that lots of previous research have applied similar loss to neural networks, but we are the first one focused on developing a faster optimization algorithm with given loss.
@@ -24,21 +24,21 @@ If you are comfortable with command line tools, you can read [conda tutorial](ht
 
 
 ## Use SGIN for Your Project
-If you would like to use SGIN for your project, you can simply copy and paste two files (i.e. [sgin_model.py](sgin_model.py) and [utils.py]) to your project folder. Then, you can use SGIN easily. 
+If you would like to use SGIN for your project, you can simply copy and paste one file (i.e. the [sgin_model.py](sgin_model.py) code) to your project folder. Then, you can use SGIN easily. 
 
 
 ## Model and Algorithm Explanation
 
-The intuition of our model is loss function is straightforward. 
+The intuition of our model is loss function is straightforward...
+
+
+![](img/sgin_algo.JPG)
 
 
 
-
-## Code and Folder Organization
-
-### Model and Source code
+### Code and Folder Organization
 - [sgin_model.py](sgin_model.py): contains the SGIN model and its optimizers
-- [utils.py](utils.py): contains some helper functions for experiments.
+- [sgin_utils.py](sgin_utils.py): contains some helper functions for experiments.
 
 - [data_prepare](data_prepare/): Folder with the data and data prepare code
     - [get_mnist.sh](data_prepare/get_mnist.sh) can download the MNIST dataset to your computer
@@ -48,8 +48,6 @@ The intuition of our model is loss function is straightforward.
     
 
 
-![](img/group_sparse_nn.png)
-![](img/sgin_algo.JPG)
 
 ## Experimentation Code
 
@@ -70,12 +68,25 @@ Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non
 
 In this experiment, we still perform binary classification on a simple dataset, Hollywood RNA Alternative Splicing Database. 
 
-Before deep learning era, some researchers use balance sampling to sample training data so that both the positive and negative class have equal number of training samples. In recent decade, people prefer to use as much data as possible and then apply weighted loss to balance the loss from the positive and negative classes.
-In this experiment, we will perform both the "balance sampling with standard loss" and the "random sampling with weighted loss" experiments. We split the data into train/valid/test parts, run the machine learning models, and report the testing results from the model with the best validation performance. Data split details is in [preprocess_rna_splicing.py](data_prepare/preprocess_rna_splicing.py) code and the [paper](https://arxiv.org/pdf/1911.13068) (page. 5).
+Before deep learning era, some researchers use balance sampling to get a subset of training set so that both the positive and negative class have equal number of samples. In recent decade, people prefer to use as much data as possible and then apply weighted loss to balance the loss from the positive and negative classes.
+In this experiment, we will perform both the "balance subset with standard loss" and the "all training samples with weighted loss" experiments. We split the data into train/valid/test parts, run the machine learning models, and report the testing results from the model with the best validation performance. Data split details is in [preprocess_rna_splicing.py](data_prepare/preprocess_rna_splicing.py) code and the [paper](https://arxiv.org/pdf/1911.13068) (page. 5).
 
 
 We select the run with best validation performance in each "Number of Sparse Groups" and then report the testing performance. The higher the Max CC, the better the results.
 
+Run the following commands for experiments
+```
+python rna_experiment.py --models SGIN lasso group_lasso --sampling balance
+python rna_experiment.py --models SGIN  --sampling all
+```
+
+![](img/rna_rst.png)
+
+You can also try to use alternative optimization algorithms for this dataset. 
+```
+python rna_experiment.py --models sgd theory  --sampling balance
+python rna_experiment.py --models sgd theory  --sampling all
+```
 
 Recommended Papers:
 - Yeo, Gene, and Christopher B. Burge. "Maximum entropy modeling of short sequence motifs with applications to RNA splicing signals." Journal of computational biology 11.2-3 (2004): 377-394.
