@@ -1,5 +1,6 @@
 # actual data
 data_prepare/mit_gene/*
+data_prepare/mnist/*
 *.pickle
 *.txt
 *.tsv

@@ -65,6 +65,8 @@ Instead, we combine these optimization methods to create the new optimization al
 
 ## Experiments
 
+In all the experiments below, we use [pyglmnet]() for group lasso, [sklearn]() for lasso, and PyTorch for all neural network based models. In general, group lasso runs much slower than other models. However,  if  your group lasso got stuck for days, you might need to confirm you have a correct pyglmnet version.
+
 ### Autism Classification and Regression
 Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non-ASD classification experiments and 
 [et_regression.py](et_regression.py) for the regression experiments.
@@ -105,10 +107,38 @@ Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, Pamela Ventola, Li
 
 ### MNIST Classification Experiment
 
+We conducted two different experiment for this dataset: 
+we use standard pixel representation for the first experiment (described in page 7 in [arXiv](https://arxiv.org/pdf/1911.13068.pdf)) and wavelet representation for the second experiment (described in page 13 in [arXiv](https://arxiv.org/pdf/1911.13068.pdf)). 
 
-Results are shown below.
+
+First, download MNIST from the [data_prepare/get_mnist.sh](data_prepare/get_mnist.sh) code. The [preprocess_mnist.py](data_prepare/preprocess_mnist.py) and [preprocess_mnist_wavelet.py](data_prepare/preprocess_mnist_wavelet.py)  code will preprocess the MNIST dataset and save the data into pickle files. Note: if you encountered errors in line 22 from these code, you might want to change the parameter to "gz=True" in line 22.
+
+
+The [mnist_experiment.py](mnist_experiment.py) contains the machine learning code for this dataset. 
+
+You can run the MNIST (raw pixel representation) experiment by the commands:
+```
+python mnist_experiment.py --models SGIN lasso group_lasso --representation raw
+```
+
+You can run the MNIST (raw pixel representation) experiment by the commands:
+```
+python mnist_experiment.py --models SGIN lasso group_lasso --representation wavelet
+```
+
+Similarly, if you want to try different optimizers, you can run the command
+```
+python mnist_experiment.py --models nn theory sgd --representation raw
+python mnist_experiment.py --models nn theory sgd --representation wavelet
+```
+
+Results from raw pixel representation experiments are shown below. 
 
 <p align="center"><img src="img/rst_for_mnist_raw_linear.png"></img></p>
+
+
+
+
 
 
 

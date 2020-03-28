@@ -21,3 +21,11 @@ regression:
 	python et_regression.py --models SGIN lasso --task iq
 	python et_regression.py --models SGIN lasso --task srs
 	python et_regression.py --models SGIN lasso --task vineland
+
+
+mnist:
+	python mnist_experiment.py --models SGIN lasso group_lasso --representation raw
+
+wavelet:
+	python mnist_experiment.py --models SGIN lasso group_lasso --representation wavelet
+
