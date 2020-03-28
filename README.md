@@ -72,7 +72,7 @@ Here we use [et_asd_classification.py](et_asd_classification.py) for the ASD/non
 Note that we only provided the dummy data (i.e. randomly generated data) for the eye-tracking experiments because of IRB (Institutional Review Board) restrictions.
 In the future, we will provide a public link for users to register account, sign consent form, and then download the actual eye-tracking data. 
 
-The dummy data are stored in CSV files under the [data_prepare/](data_prepare/) folder. The last column of each CSV file is the label for the data, and all the other columns are features that will be used for machine learning.
+The dummy data are stored in CSV files under the [data_prepare/](data_prepare/) folder. The last column of each CSV file is the label for the data, and all the other columns are features that will be used for machine learning.  Note that the model might fail to converge with these randomly generated "dummy" data.
 
 #### ASD/non-ASD Classification
 
@@ -87,8 +87,19 @@ You can run  `python et_asd_classification.py --models theory nn sgd` command if
 
 #### ADOS/IQ/SRS/Vineland Regression
 
-ADOS, IQ, SRS, and Vineland scores are important to survey autism severity. Our SGIN model and lasso performs well to predict IQ for participants, but all methods failed to predict ADOS/SRS/Vineland scores because of the limitation of our dataset. 
+ADOS, IQ, SRS, and Vineland scores are important to survey autism severity. Our SGIN model and lasso performs well to predict IQ for participants, but all methods failed to predict ADOS/SRS/Vineland scores because of the limitation of our dataset. In another on-going study, our collaborators collected similar eye-tracking data from 3x more participants and achieved satisfiable regression results with linear models. More studies are needed to fully investigate eye-tracking features and meaningful biomarkers for children with ASD in the future.
 
+To run all the regression experiments, you can try the commands below:
+```
+python et_regression.py --models SGIN lasso --task ados
+python et_regression.py --models SGIN lasso --task iq
+python et_regression.py --models SGIN lasso --task srs
+python et_regression.py --models SGIN lasso --task vineland
+```
+
+More regression results and discussions can be found in our paper:
+
+Beibin Li, Erin Barney, Caitlin Hudac, Nicholas Nuechterlein, Pamela Ventola, Linda Shapiro, and Frederick Shic. 2020. _Selection of Eye-Tracking Stimuli for Prediction by Sparsely Grouped Input Variablesfor Neural Networks: towards Biomarker Refinement for Autism_. In ETRA '20: ACM Symposium on Eye Tracking Research and Appli-cations, June 02–05, 2020, Stuttgart, Germany. ACM, New York, NY, USA, 10 pages
 
 
 

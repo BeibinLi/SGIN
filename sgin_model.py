@@ -236,6 +236,9 @@ def sbcgd_train(model, criterion, dataloader, lr=0.1, lam=0.1, verbose=True):
     
     losses = []
     for group_id in groups_:
+        if len(model.sparse_groups) == len(model.group_idx) - 1:
+            return # Done, sparsified all groups except the remaining one
+            
         feature_ids = model.group_idx[group_id]
         
         if group_id in model.sparse_groups:
@@ -268,7 +271,6 @@ def sbcgd_train(model, criterion, dataloader, lr=0.1, lam=0.1, verbose=True):
             optimizer.zero_grad()
             pred = model(x)            
             
-            # pdb.set_trace()
             pred_loss = criterion(pred, y)
 
             # The Group Regularization Term we defined
@@ -344,6 +346,9 @@ def theory_sbcgd_train(model, criterion, dataloader, lr=0.1, lam=0.1, verbose=Tr
 
     losses = []
     for group_id in groups_:
+        if len(model.sparse_groups) == len(model.group_idx) - 1:
+            return # Done, sparsified all groups except the remaining one
+
         feature_ids = model.group_idx[group_id]
         
         if group_id in model.sparse_groups:
